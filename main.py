@@ -13,7 +13,8 @@ menuArkaplan = Actor("menuarkaplan")
 hucre2= Actor("ground2")
 kenar = Actor("kenar")
 player = Actor("karakter")
-enemy = Actor("enemy",topleft = (hucre.width * 10,hucre.height * 10))
+enemy = Actor("enemy",(hucre.width * 10,hucre.height * 10))
+
 mode = "menu"
 play = Actor("play")
 sesacik = Actor("sesacik",(hucre.width*45,hucre.height*3))
@@ -24,11 +25,12 @@ sesacikmi = True
 
 player_images = ['karakter', 'karakter2', 'karakter3']
 player.images = player_images
-#enem1_target_list = [(hucre.width* 9,hucre.height * 9),(hucre.width* 9,hucre.height * 8),(hucre.width* 9,hucre.height * 7),
- #                       (hucre.width* 8,hucre.height * 7),(hucre.width* 8,hucre.height * 8),(hucre.width* 8,hucre.height * 6)]
+#enem1_target_list = [(hucre.width* 10,hucre.height * 10),(hucre.width* 9,hucre.height * 10),(hucre.width* 8,hucre.height * 10),
+#                     (hucre.width* 10,hucre.height * 9),(hucre.width* 9,hucre.height * 9),(hucre.width* 8,hucre.height * 9)]
+enem1_target_list = [(10,10),(9,10),(8,10),
+                       (10,9),(9,9),(8,9)]
 
-enem1_target_list = [hucre.width* 9,hucre.width* 8,hucre.width* 7,hucre.width* 6,hucre.width* 5]
-enemy_x = enem1_target_list[0]
+
 map = [[2, 2, 2, 2, 2, 2, 2, 2, 2,2,2,2], 
           [2, 0, 0, 0, 1, 0, 0, 0, 0,0,0,2], 
           [2, 0, 0, 0, 0, 0, 0, 0, 0,0,0,2], 
@@ -59,20 +61,21 @@ def map_draw():
 kontrol = 0
 def enemy_move():
     global kontrol
-    if len(enem1_target_list)-1 > kontrol:
+    if len(enem1_target_list)-1> kontrol:
         kontrol +=1
-        enemy.x = enem1_target_list[kontrol]
+        
     else:
         kontrol = 0
+    enemy.pos = enem1_target_list[kontrol][0] * hucre.width+ enemy.width / 2 , enem1_target_list[kontrol][1]* hucre.height+ enemy.height / 2
 
 
 
 
 
-
-music.play("muzik")
-
+#music.play("muzik")
+music.set_volume(0.2)
 clock.schedule_interval(enemy_move, 1.0)
+clock.schedule_interval(player.next_image, 0.5)
 def draw():
     if mode == "menu":
         menuArkaplan.draw()
@@ -126,6 +129,8 @@ def on_mouse_down(pos, button):
 
 
 def update(dt):
-    player.next_image()
+    #player.next_image()
     #enemy_move()
-
+    if player.colliderect(enemy):
+        #sounds.carpisma.play()
+        pass
