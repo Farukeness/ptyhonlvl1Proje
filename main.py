@@ -1,7 +1,7 @@
 import random
 from pgzhelper import *
 
-import pgzrun
+import pgzero
 hucre= Actor("ground1")
 screen_width =50
 screen_height = 25 
@@ -13,6 +13,7 @@ menuArkaplan = Actor("menuarkaplan")
 hucre2= Actor("ground2")
 kenar = Actor("kenar")
 player = Actor("karakter")
+enemy = Actor("enemy",topleft = (hucre.width * 10,hucre.height * 10))
 mode = "menu"
 play = Actor("play")
 sesacik = Actor("sesacik",(hucre.width*45,hucre.height*3))
@@ -23,7 +24,11 @@ sesacikmi = True
 
 player_images = ['karakter', 'karakter2', 'karakter3']
 player.images = player_images
+#enem1_target_list = [(hucre.width* 9,hucre.height * 9),(hucre.width* 9,hucre.height * 8),(hucre.width* 9,hucre.height * 7),
+ #                       (hucre.width* 8,hucre.height * 7),(hucre.width* 8,hucre.height * 8),(hucre.width* 8,hucre.height * 6)]
 
+enem1_target_list = [hucre.width* 9,hucre.width* 8,hucre.width* 7,hucre.width* 6,hucre.width* 5]
+enemy_x = enem1_target_list[0]
 map = [[2, 2, 2, 2, 2, 2, 2, 2, 2,2,2,2], 
           [2, 0, 0, 0, 1, 0, 0, 0, 0,0,0,2], 
           [2, 0, 0, 0, 0, 0, 0, 0, 0,0,0,2], 
@@ -50,16 +55,37 @@ def map_draw():
                 kenar.left = kenar.width*j
                 kenar.top = kenar.height*i
                 kenar.draw()
+
+kontrol = 0
+def enemy_move():
+    global kontrol
+    if len(enem1_target_list)-1 > kontrol:
+        kontrol +=1
+        enemy.x = enem1_target_list[kontrol]
+    else:
+        kontrol = 0
+
+
+
+
+
+
 music.play("muzik")
+
+clock.schedule_interval(enemy_move, 1.0)
 def draw():
     if mode == "menu":
         menuArkaplan.draw()
         play.draw()
         sesacik.draw()
     elif mode == "game":
+        
+            
         map_draw()
         player.draw()
         sesacik.draw()
+        enemy.draw()
+        screen.draw.text(str(kontrol),pos= (hucre.width*5,hucre.height*2))
 
 def on_key_down(key):
     if keyboard.right:
@@ -101,6 +127,5 @@ def on_mouse_down(pos, button):
 
 def update(dt):
     player.next_image()
+    #enemy_move()
 
-
-pgzrun.go()
