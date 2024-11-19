@@ -1,7 +1,8 @@
 import random
 from pgzhelper import *
-from move import Enemy
+from move import Enemy,character_move
 import pgzero
+import pgzrun
 cell1= Actor("ground1")
 screen_width =35
 screen_height = 25 
@@ -16,48 +17,66 @@ enem2_target_list = [(20,20),(20,19),(20,18),(20,17),(20,16),(20,15),
                      (21,15),(22,15),(23,15),(24,15),
                      (24,16),(24,17),(24,18),(24,19),(24,20),
                      (23,20),(22,20),(21,20),(20,20)]
-
 enemy_images = ["enemy","enemy1_2","enemy1_3"]
 enemy2_images = ["wizard","enem2_2","enemy2_3"]
-
 enemy = Actor("enemy", (160,160))
 enemyy = Enemy(enem1_target_list,70,enemy,enemy_images,cell1.width,cell1.height,enemy.width,enemy.height)
 enemy2 = Actor("wizard",(320,320))
 enemyy2 = Enemy(enem2_target_list,100,enemy2,enemy2_images,cell1.width,cell1.height,enemy2.width,enemy2.height)
 
-menuBackground = Actor("menuarkaplan")
-cell2= Actor("ground2")
-side = Actor("kenar")
-player = Actor("karakter",topleft = (cell1.width * 1 ,cell1.height * 1))
-x = Actor("x",(cell1.width * 28,cell1.height * 3))
-mode = "menu"
 
-potions = []
-play = Actor("play",(WIDTH/2,HEIGHT/2))
-sound = Actor("sesacik",(cell1.width*33,cell1.height*3))
-soundOn = True
-a = 0
-b = 0
-potion1 = Actor("potion",topleft =(cell1.width* 10,cell1.height*9))
-potion2 = Actor("iksir",topleft = (cell1.width* 20,cell1.height*15))
 
-potions.append(potion1)
-potions.append(potion2)
+#Player
+character_left_moves = ["player_left","player_left2","player_left3"]
+character_right_moves = ["player_right","player_right2","player_right3"]
+player = Actor("character",topleft = (cell1.width * 1 ,cell1.height * 1))
+playerr = character_move(player,character_left_moves,character_right_moves,cell1.width,cell1.height)
 player_pos = (0,0)
 
-player_images = ['karakter', 'karakter2', 'karakter3']
-player.images = player_images
+#Buttons
+x = Actor("x",(cell1.width * 28,cell1.height * 3))
+mode = "menu"
+play = Actor("play",(WIDTH/2,HEIGHT/2))
+play_again = Actor("play_again",(WIDTH/2,HEIGHT/2))
+sound = Actor("sound_on",(cell1.width*33,cell1.height*3))
+soundOn = True
+#Map
+cell2= Actor("ground2")
+side = Actor("side")
+side2 = Actor("side2")
+fence = Actor("fence")
+menuBackground = Actor("menubackground")
+gameoverbackground = Actor("game_over_background")
+#Potions
+potion1 = Actor("potion",topleft =(cell1.width* 10,cell1.height*9))
+potion2 = Actor("potion2",topleft = (cell1.width* 20,cell1.height*15))
+potions = []
+potions.append(potion1)
+potions.append(potion2)
+#hearts
+hearts = []
+heart = Actor("heart",topleft = (cell1.width * 25,cell1.height*0))
+heart2 = Actor("heart",topleft = (cell1.width * 24,cell1.height*0))
+heart3 = Actor("heart",topleft = (cell1.width * 23,cell1.height*0))
+def hearts_add():
+    hearts.append(heart)
+    hearts.append(heart2)
+    hearts.append(heart3)
+hearts_add()
+
+
+
+
 
 
 cell2_rects = [] 
-side_rects = [] 
 map = [
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2], 
+    [2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2], 
     [2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
     [2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
-    [2, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
+    [2, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 2], 
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
     [2, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
@@ -76,10 +95,10 @@ map = [
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 2], 
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2], 
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+    [2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2]
 ]
 def map_draw():
-    global cell2_rects,side_rects
+    global cell2_rects
     
     for i in range(len(map)):
         for j in range(len(map[0])):
@@ -96,12 +115,20 @@ def map_draw():
                 side.left = side.width*j
                 side.top = side.height*i
                 side.draw()
-                side_rects.append(Rect((side.left, side.top), (side.width, side.height)))
+            elif map[i][j] == 3:
+                side2.left = side.width*j
+                side2.top = side.height*i
+                side2.draw()
+            elif map[i][j] == 4:
+                fence.left = fence.width*j
+                fence.top = fence.height*i
+                fence.draw()
+               
 
 
 music.play("muzik")
 music.set_volume(0.2)
-clock.schedule_interval(player.next_image, 0.5)
+
 def draw():
     if mode == "menu":
         menuBackground.draw()
@@ -117,69 +144,100 @@ def draw():
         x.draw()
         for i in range(len(potions)):
             potions[i].draw()
-
-def on_key_down(key):
-    global player_x,player_y,player_pos
-    player_x = player.x
-    player_y = player.y
-    player_pos = player.pos
-    if keyboard.right and player.x < cell1.width*24:
-        player.x += cell1.width
+        for i in range(len(hearts)):
+            hearts[i].draw()
+    elif mode == "game_over":
+        gameoverbackground.draw()
+        sound.draw()
+        x.draw()
         
-    elif keyboard.left and player.x > cell1.width *2:
-        player.x -= cell1.width
-        
-    elif keyboard.up and player.y > cell1.height * 2:
-        player.y -= cell1.height
-    elif keyboard.down and player.y < cell1.height * 23 :
-        player.y += cell1.height
+        play_again.draw()
+    
 def on_mouse_down(pos, button):
     global soundOn,mode
     if mode == "menu":
-        if button == mouse.LEFT and sound.collidepoint(pos):
+        if sound.collidepoint(pos):
             if soundOn == True:
                 soundOn = False
-                sound.image = "seskapali"
+                sound.image = "sound_off"
                 music.pause()
             else:
                 soundOn = True
-                sound.image = "sesacik"
+                sound.image = "sound_on"
                 music.unpause()
-        elif button == mouse.LEFT and play.collidepoint(pos):
+        elif play.collidepoint(pos):
             mode = "game"
             x.image = "x_game"
-        elif button == mouse.LEFT and x.collidepoint(pos):
+        elif  x.collidepoint(pos):
             exit()
     elif mode == "game":
-        if button == mouse.LEFT and sound.collidepoint(pos):
+        if sound.collidepoint(pos):
             if soundOn == True:
                 soundOn = False
-                sound.image = "seskapali"
+                sound.image = "sound_off"
                 music.pause()
             else:
                 soundOn = True
-                sound.image = "sesacik"
+                sound.image = "sound_on"
                 music.unpause()
-        elif button == mouse.LEFT and x.collidepoint(pos):
+        elif x.collidepoint(pos):
             mode = "menu"
             x.image = "x"
+    elif mode == "game_over":
+        if sound.collidepoint(pos):
+            if soundOn == True:
+                soundOn = False
+                sound.image = "sound_off"
+                music.pause()
+            else:
+                soundOn = True
+                sound.image = "sound_on"
+                music.unpause()
+        elif play_again.collidepoint(pos):
+            mode = "game"
+            x.image = "x_game"
+            hearts_add()
+            
+        elif x.collidepoint(pos):
+            exit()
+
+
+def on_key_down(key):
+    global player_pos
+    player_pos = player.pos
+    if keyboard.right and player.x < cell1.width*24:
+        playerr.move("right")
+        
+    elif keyboard.left and player.x > cell1.width *2:
+        playerr.move("left")
+        
+    elif keyboard.up and player.y > cell1.height * 2:
+        playerr.move("up")
+    elif keyboard.down and player.y < cell1.height * 23 :
+        playerr.move("down")
 
 def update(dt):
     global mode
     enemyy.update(dt)
     enemyy2.update(dt)
+    playerr.update_animation(dt)
     if mode == "game" and player.colliderect(enemy):
         if soundOn == True:
             sounds.carpisma.play()
+        hearts.pop()
         player.pos = (cell1.width* 1+ player.width /2 ,cell1.height* 1+ player.height/ 2)
     for i in range(len(potions)):
         if potions[i].colliderect(player):
             potions.pop(i)
             if soundOn == True:
                 sounds.yutmasesi.play()
-            player.image = "iksirtoplayincakarakter"
+            player.image = "character_with_potions"
             break        
     for rect in cell2_rects:
         if player.colliderect(rect):
             player.pos = player_pos
+    if len(hearts) <=0:
+        mode = "game_over"
         
+
+pgzrun.go()

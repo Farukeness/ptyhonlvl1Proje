@@ -54,3 +54,52 @@ class Enemy:
     def draw(self):
         self.sprite.image = self.animation_frames[self.current_frame]
         self.sprite.draw()
+
+
+
+class character_move:
+    def __init__(self, actor,left_list,right_list,cell_width,cell_height):
+        self.actor = actor  
+        self.animations = {  
+            "left": left_list,
+            "right": right_list
+        }
+        self.left_list = left_list
+        self.right_list = right_list
+        self.cell_width = cell_width
+        self.cell_height = cell_height
+        self.default_img = right_list[0]  
+        self.c_direction = "right"  
+        self.c_frame = 0  
+        self.animation_time = 0.1  
+        self.time = 0  
+
+    def update_animation(self, dt):
+        frames = self.animations.get(self.c_direction, [self.default_img])
+        if len(frames) > 1:
+            self.time += dt
+            if self.time >= self.animation_time:
+                self.current_frame = (self.c_frame + 1) % len(frames)
+                self.actor.image = frames[self.c_frame]
+                self.time = 0
+
+    def move(self, direction):
+        
+        if direction in ["left", "right"]:
+            self.c_direction = direction
+            if direction == "left":
+                self.actor.x -= self.cell_width  
+            elif direction == "right":
+                self.actor.x += self.cell_height 
+
+            
+            self.c_frame = 0
+            self.actor.image = self.animations[direction][self.c_frame]
+        elif direction in ["up", "down"]:
+            if direction == "up":
+                self.actor.y -= 16
+            elif direction == "down":
+                self.actor.y += 16
+
+            
+            self.actor.image = self.default_img
