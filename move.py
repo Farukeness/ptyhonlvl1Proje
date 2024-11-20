@@ -79,7 +79,7 @@ class character_move:
         if len(frames) > 1:
             self.time += dt
             if self.time >= self.animation_time:
-                self.current_frame = (self.c_frame + 1) % len(frames)
+                self.c_frame = (self.c_frame + 1) % len(frames)
                 self.actor.image = frames[self.c_frame]
                 self.time = 0
 
