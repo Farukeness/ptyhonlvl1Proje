@@ -17,23 +17,27 @@ enem2_target_list = [(20,20),(20,19),(20,18),(20,17),(20,16),(20,15),
                      (21,15),(22,15),(23,15),(24,15),
                      (24,16),(24,17),(24,18),(24,19),(24,20),
                      (23,20),(22,20),(21,20),(20,20)]
-railcar_target = [(14,5),(14,6),(14,7),(14,8),(14,9),(14,10),(14,11),(14,12)]
+railcar_target_list = [(14,5),(14,6),(14,7),(14,8),(14,9),(14,10),(14,11),(14,12)]
+
 enemy_images = ["enemy","enemy1_2","enemy1_3"]
 enemy2_images = ["wizard","enem2_2","enemy2_3"]
 railcar_images = ["railcar","railcar2"]
 enemy = Actor("enemy", (160,160))
-enemyy = Enemy(enem1_target_list,70,enemy,enemy_images,cell1.width,cell1.height,enemy.width,enemy.height)
+enemyy = Enemy(enem1_target_list,enemy,enemy_images)
 enemy2 = Actor("wizard",(320,320))
-enemyy2 = Enemy(enem2_target_list,100,enemy2,enemy2_images,cell1.width,cell1.height,enemy2.width,enemy2.height)
+enemyy2 = Enemy(enem2_target_list,enemy2,enemy2_images)
 railcar = Actor("railcar",topleft =( cell1.width * 14,cell1.height*5))
-railcarr = Enemy(railcar_target,10,railcar,railcar_images,cell1.width,cell1.height,enemy2.width,enemy2.height)
-
+railcarr = Enemy(railcar_target_list,railcar,railcar_images)
+clock.schedule_interval(enemyy.update,0.4)
+clock.schedule_interval(enemyy2.update,0.1)
+clock.schedule_interval(railcarr.update,0.3)
 #Player
 character_left_moves = ["player_left","player_left2","player_left3"]
 character_right_moves = ["player_right","player_right2","player_right3"]
 player = Actor("character",topleft = (cell1.width * 1 ,cell1.height * 1))
-playerr = character_move(player,character_left_moves,character_right_moves,cell1.width,cell1.height)
-player_pos = (0,0)
+player_move = character_move(player,character_left_moves,character_right_moves)
+player_start_pos = (16* 1+8 ,16* 1+ 8)
+clock.schedule_interval(player_move.update_animation_new,0.1)
 
 #Buttons
 x = Actor("x",topleft = (cell1.width * 34,cell1.height * 0))
@@ -142,8 +146,49 @@ def map_draw():
                 leftside.left = leftside.width*j
                 leftside.top = leftside.height*i
                 leftside.draw()
-               
-
+def default_settings(pos,mod="menu"):
+    global soundOn,mode
+    if sound.collidepoint(pos):
+            if soundOn == True:
+                soundOn = False
+                sound.image = "sound_off"
+                music.pause()
+            else:
+                soundOn = True
+                sound.image = "sound_on"
+                music.unpause()
+    elif  x.collidepoint(pos):
+            if mod == "game":
+                mode = "menu"
+                x.image = "x"
+            else:
+                exit()
+def default_set2(pos):
+    if play_again.collidepoint(pos):
+        global mode,succesSound,tadaSound
+        mode = "menu"
+        x.image = "x_game"
+        hearts.clear()
+        hearts_add()
+        potions_add()
+        gain.clear()
+        player.pos = player_start_pos
+        potion1.pos = (16 * 10 + 16 / 2, 16 * 9+ 16 / 2)
+        potion2.pos = (16 * 20 + 16 / 2, 16 * 15+ 16 / 2)          
+        leftdoor.image = "leftdoor"
+        rightdoor.image = "rightdoor"
+        succesSound = False
+        tadaSound = False
+def collect_potion():
+    for i in range(len(potions)):
+        if potions[i].colliderect(player):
+            potions[i].pos = (16 *(21 +i) + 8,16*0+8)
+            gain.append(potions[i])
+            
+            if soundOn == True:
+                sounds.yutmasesi.play()
+            player.image = "character_with_potions"
+            break        
 def draw():
     if mode == "menu":
         menuBackground.draw()
@@ -154,8 +199,8 @@ def draw():
         map_draw()
         player.draw()
         sound.draw()
-        enemyy.draw()
-        enemyy2.draw()
+        enemy.draw()
+        enemy2.draw()
         x.draw()
         railcar.draw()
         leftdoor.draw()
@@ -177,140 +222,77 @@ def draw():
         sound.draw()
         x.draw()
         play_again.draw()
-    
-def on_mouse_down(pos, button):
-    global soundOn,mode,gameSound,succesSound,tadaSound
+
+def on_mouse_down(pos):
+    global mode
     if mode == "menu":
-        if sound.collidepoint(pos):
-            if soundOn == True:
-                soundOn = False
-                sound.image = "sound_off"
-                music.pause()
-            else:
-                soundOn = True
-                sound.image = "sound_on"
-                music.unpause()
-        elif play.collidepoint(pos):
+        default_settings(pos)
+        if play.collidepoint(pos):
             mode = "game"
             x.image = "x_game"
             
-        elif  x.collidepoint(pos):
-            exit()
     elif mode == "game":
-        if sound.collidepoint(pos):
-            if soundOn == True:
-                soundOn = False
-                sound.image = "sound_off"
-                music.pause()
-            else:
-                soundOn = True
-                sound.image = "sound_on"
-                music.unpause()
-        elif x.collidepoint(pos):
-            mode = "menu"
-            x.image = "x"
+        default_settings(pos,"game")
+        
     elif mode == "game_over":
-
-        if sound.collidepoint(pos):
-            if soundOn == True:
-                soundOn = False
-                sound.image = "sound_off"
-                music.pause()
-            else:
-                soundOn = True
-                sound.image = "sound_on"
-                music.unpause()
-        elif play_again.collidepoint(pos):
-            mode = "game"
-            x.image = "x_game"
-            hearts_add()
-            potions_add()
-            gameSound = False
-            succesSound = False
-            tadaSound = False
-            potion1.pos = (cell1.width* 10 + potion1.width / 2,cell1.height*9 + potion1.height / 2)
-            potion2.pos = (cell1.width* 20 + potion2.width / 2,cell1.height*15 + potion2.height / 2)
-        elif x.collidepoint(pos):
-            exit()
+        default_settings(pos)
+        default_set2(pos)
+            
     elif mode == "game_win":
-        if sound.collidepoint(pos):
-            if soundOn == True:
-                soundOn = False
-                sound.image = "sound_off"
-                music.pause()
-            else:
-                soundOn = True
-                sound.image = "sound_on"
-                music.unpause()
-        elif play_again.collidepoint(pos):
-            mode = "menu"
-            hearts_add()
-            player.pos = (cell1.width * 1 + player.width /2 , cell1.height * 1 +player.height  /2)
-            potion1.pos = (cell1.width * 10 + potion1.width / 2, cell1.height * 9+ potion1.height / 2)
-            potion2.pos = (cell1.width * 20 + potion2.width / 2, cell1.height * 15+ potion2.height / 2)
-            gain.clear()
-            leftdoor.image = "leftdoor"
-            rightdoor.image = "rightdoor"
-            gameSound = False
-            succesSound = False
-            tadaSound = False
-        elif x.collidepoint(pos):
-            exit()
+        default_settings(pos)
+        default_set2(pos)
+
+
 def on_key_down(key):
     global player_pos
     player_pos = player.pos
-    if keyboard.right and player.x < cell1.width*33:
-        playerr.move("right")
+    if keyboard.right and player.x < cell1.width*33 :
+        player_move.move("right")
         
     elif keyboard.left and player.x > cell1.width *2:
-        playerr.move("left")
+        player_move.move("left")
         
     elif keyboard.up and player.y > cell1.height * 2:
-        playerr.move("up")
+        player_move.move("up")
     elif keyboard.down and player.y < cell1.height * 23 :
-        playerr.move("down")
+        player_move.move("down")
+    for rect in cell2_rects:
+        if player.colliderect(rect):
+            player.pos = player_pos 
 
 def update(dt):
     global mode,gameSound,succesSound,tadaSound
-    enemyy.update(dt)
-    enemyy2.update(dt)
-    railcarr.update(dt)
-    playerr.update_animation(dt)
-    if mode == "game" and player.colliderect(enemy) or player.colliderect(enemy2):
-        if soundOn == True:
-            sounds.carpisma.play()
-        hearts.pop()
-        player.pos = (cell1.width* 1+ player.width /2 ,cell1.height* 1+ player.height/ 2)
-    for i in range(len(potions)):
-        if potions[i].colliderect(player):
-            potions[i].pos = (cell1.width *(21 +i) + potions[i].width / 2,cell1.height*0+ potions[i].height / 2)
-            gain.append(potions[i])
-            
+    if mode == "game":
+        #colliderects
+        if player.colliderect(enemy) or player.colliderect(enemy2):
             if soundOn == True:
-                sounds.yutmasesi.play()
-            player.image = "character_with_potions"
-            break        
-    for rect in cell2_rects:
-        if player.colliderect(rect):
-            player.pos = player_pos
+                sounds.carpisma.play()
+            player.pos = player_start_pos
+            
+            hearts.pop()
+        elif player.colliderect(leftdoor) or player.colliderect(rightdoor):
+            if leftdoor.image == "leftopendoor":
+                mode = "game_win"
+            
+            if tadaSound == False and soundOn == True:
+                tadaSound = True
+                sounds.tada.play()
+    collect_potion()
     
+    #game over
     if len(hearts) <=0:
         mode = "game_over"
         gain.clear()
+        x.image = "x"
         if soundOn == True and gameSound == False:
             sounds.game_over.play() 
             gameSound = True
+    #game win
     if len(gain) ==2:
         if soundOn == True and succesSound == False:
             sounds.success.play()
             succesSound = True
         leftdoor.image = "leftopendoor"
         rightdoor.image = "rightopendoor"
-    if mode == "game" and player.colliderect(leftdoor) or player.colliderect(rightdoor):
-        if leftdoor.image == "leftopendoor":
-            mode = "game_win"
-            if tadaSound == False and soundOn == True:
-                tadaSound = True
-                sounds.tada.play()
 
 pgzrun.go()
