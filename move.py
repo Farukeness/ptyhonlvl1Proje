@@ -1,7 +1,8 @@
+from pgzhelper import *
 class Enemy:
-    def __init__(self, target_list,enemy,enemy_images):
+    def __init__(self, target_list,enemy,enemy_images,enemy_pos):
         self.target_list = target_list 
-        self.enemy = enemy
+        self.enemy = Actor(enemy,enemy_pos)
         self.enemy_images = enemy_images
         self.current_target = 0   
         self.start_number = 0  
@@ -22,10 +23,11 @@ class Enemy:
         else:
             self.start_number = 0
         self.enemy.image = self.enemy_images[self.start_number]
-        
-class character_move:
-    def __init__(self, actor,left_list,right_list):
-        self.actor = actor  
+    def draw(self):
+        self.enemy.draw()
+class CharacterClass:
+    def __init__(self, actor,actor_pos,left_list,right_list):
+        self.actor = Actor(actor, actor_pos)
         self.left_list = left_list
         self.right_list = right_list
         self.current_direction = "right"  
@@ -55,5 +57,8 @@ class character_move:
             self.actor.y -= 16
         elif direction == "down":
             self.actor.y += 16
+
+    def draw(self):
+        self.actor.draw()
 
             

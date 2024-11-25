@@ -1,6 +1,6 @@
 import random
 from pgzhelper import *
-from move import Enemy,character_move
+from move import Enemy,CharacterClass
 
 import pgzrun
 cell1= Actor("ground1")
@@ -22,22 +22,23 @@ railcar_target_list = [(14,5),(14,6),(14,7),(14,8),(14,9),(14,10),(14,11),(14,12
 enemy_images = ["enemy","enemy1_2","enemy1_3"]
 enemy2_images = ["wizard","enem2_2","enemy2_3"]
 railcar_images = ["railcar","railcar2"]
-enemy = Actor("enemy", (160,160))
-enemyy = Enemy(enem1_target_list,enemy,enemy_images)
-enemy2 = Actor("wizard",(320,320))
-enemyy2 = Enemy(enem2_target_list,enemy2,enemy2_images)
-railcar = Actor("railcar",topleft =( cell1.width * 14,cell1.height*5))
-railcarr = Enemy(railcar_target_list,railcar,railcar_images)
+
+
+enemys = ["enemy","wizard","railcar"]
+enemy_pos = [(160,160),(320,320),(224,80)]
+enemyy = Enemy(enem1_target_list,enemys[0],enemy_images,enemy_pos[0])
+wizard = Enemy(enem2_target_list,enemys[1],enemy2_images,enemy_pos[1])
+railcarr = Enemy(railcar_target_list,enemys[2],railcar_images,enemy_pos[2])
 clock.schedule_interval(enemyy.update,0.4)
-clock.schedule_interval(enemyy2.update,0.1)
+clock.schedule_interval(wizard.update,0.1)
 clock.schedule_interval(railcarr.update,0.3)
 #Player
 character_left_moves = ["player_left","player_left2","player_left3"]
 character_right_moves = ["player_right","player_right2","player_right3"]
-player = Actor("character",topleft = (cell1.width * 1 ,cell1.height * 1))
-player_move = character_move(player,character_left_moves,character_right_moves)
 player_start_pos = (16* 1+8 ,16* 1+ 8)
-clock.schedule_interval(player_move.update_animation_new,0.1)
+Character  = CharacterClass("character",player_start_pos,character_left_moves,character_right_moves)
+
+clock.schedule_interval(Character.update_animation_new,0.1)
 
 #Buttons
 x = Actor("x",topleft = (cell1.width * 34,cell1.height * 0))
@@ -172,7 +173,7 @@ def default_set2(pos):
         hearts_add()
         potions_add()
         gain.clear()
-        player.pos = player_start_pos
+        Character.actor.pos = player_start_pos
         potion1.pos = (16 * 10 + 16 / 2, 16 * 9+ 16 / 2)
         potion2.pos = (16 * 20 + 16 / 2, 16 * 15+ 16 / 2)          
         leftdoor.image = "leftdoor"
@@ -181,13 +182,13 @@ def default_set2(pos):
         tadaSound = False
 def collect_potion():
     for i in range(len(potions)):
-        if potions[i].colliderect(player):
+        if potions[i].colliderect(Character.actor):
             potions[i].pos = (16 *(21 +i) + 8,16*0+8)
             gain.append(potions[i])
             
             if soundOn == True:
                 sounds.yutmasesi.play()
-            player.image = "character_with_potions"
+            Character.actor.image = "character_with_potions"
             break        
 def draw():
     if mode == "menu":
@@ -197,12 +198,12 @@ def draw():
         x.draw()
     elif mode == "game":
         map_draw()
-        player.draw()
+        Character.draw()
         sound.draw()
-        enemy.draw()
-        enemy2.draw()
+        enemyy.draw()
+        wizard.draw()
         x.draw()
-        railcar.draw()
+        railcarr.draw()
         leftdoor.draw()
         
         rightdoor.draw()
@@ -245,32 +246,32 @@ def on_mouse_down(pos):
 
 def on_key_down(key):
     global player_pos
-    player_pos = player.pos
-    if keyboard.right and player.x < cell1.width*33 :
-        player_move.move("right")
+    player_pos = Character.actor.pos
+    if keyboard.right and Character.actor.x < cell1.width*33 :
+        Character.move("right")
         
-    elif keyboard.left and player.x > cell1.width *2:
-        player_move.move("left")
+    elif keyboard.left and Character.actor.x > cell1.width *2:
+        Character.move("left")
         
-    elif keyboard.up and player.y > cell1.height * 2:
-        player_move.move("up")
-    elif keyboard.down and player.y < cell1.height * 23 :
-        player_move.move("down")
+    elif keyboard.up and Character.actor.y > cell1.height * 2:
+        Character.move("up")
+    elif keyboard.down and Character.actor.y< cell1.height * 23 :
+        Character.move("down")
     for rect in cell2_rects:
-        if player.colliderect(rect):
-            player.pos = player_pos 
+        if Character.actor.colliderect(rect):
+            Character.actor.pos = player_pos 
 
 def update(dt):
     global mode,gameSound,succesSound,tadaSound
     if mode == "game":
         #colliderects
-        if player.colliderect(enemy) or player.colliderect(enemy2):
+        if Character.actor.colliderect(enemyy.enemy) or Character.actor.colliderect(wizard.enemy):
             if soundOn == True:
                 sounds.carpisma.play()
-            player.pos = player_start_pos
+            Character.actor.pos = player_start_pos
             
             hearts.pop()
-        elif player.colliderect(leftdoor) or player.colliderect(rightdoor):
+        elif Character.actor.colliderect(leftdoor) or Character.actor.colliderect(rightdoor):
             if leftdoor.image == "leftopendoor":
                 mode = "game_win"
             
